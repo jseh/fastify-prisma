@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  # fast:
+  #   container_name: ${DOCKER_CONTAINER_NAME}-fastify
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: dev
+  #     args:
+  #       - NODE_ENV=9
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "127.0.0.1:3000:3000"
+  #   networks:
+  #     - fastify-net
+  #   depends_on:
+  #     - mysql
+  #     - redis
+  #   volumes:
+  #     - .:/app
+  #     - nodemodules-volume:/app/node_modules
+  #   #command: bash -c "npm run start:dev"
+  #   # command: tail -f /dev/null
+  #   command: npm run dev
+  #   # command: 
+
+  mysql:
+    container_name: ${DOCKER_CONTAINER_NAME}-mysql
+    image: mysql:8.0.31
+    ports:
+      - "3309:3306"
+    networks:
+      - fastify-net
+    environment:
+      MYSQL_DATABASE: "prismadb"
+      MYSQL_USER: "prisma"
+      MYSQL_PASSWORD: "prisma"
+      MYSQL_ROOT_PASSWORD: "prismaroot"
+    volumes:
+      - mysqldb-volume:/var/lib/mysql
+
+  redis:
+    container_name: ${DOCKER_CONTAINER_NAME}-redis
+    image: redis:7.0.5-alpine3.17
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
+networks:
+  fastify-net:
+    driver: bridge
+    name: fastify-net
+
+volumes:
+  mysqldb-volume:
+  nodemodules-volume:
